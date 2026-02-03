@@ -116,9 +116,25 @@ All these platforms support persistent disk storage for SQLite databases.
 
 ## Database
 
-This app uses **SQLite** - a simple, fast, file-based database that requires zero configuration!
+This app now supports both **SQLite** (local) and **MongoDB Atlas** (cloud)!
 
-### Why SQLite?
+### 🍃 MongoDB Atlas (Recommended for Production)
+- ✅ **Cloud-Hosted** - Works perfectly with Vercel
+- ✅ **Free Tier** - 512MB storage included
+- ✅ **Persistent Data** - No data loss on deployment
+- ✅ **Auto Backups** - Built-in data protection
+- ✅ **Scalable** - Grows with your business
+
+**Setup Guide**: See [MONGODB-SETUP.md](MONGODB-SETUP.md) for step-by-step instructions
+
+### 💾 SQLite (Local Development)
+- ✅ **Zero Setup** - No installation needed
+- ✅ **Fast** - Perfect for local testing
+- ⚠️ **Vercel Limitation** - Database resets on deployment
+
+**Current Mode**: The app is configured to use MongoDB. To switch back to SQLite, change `database-mongo.js` to `database.js` in `server.js`
+
+### Why MongoDB Atlas?
 - ✅ **Zero Setup**: No installation or configuration needed
 - ✅ **Fast**: High-performance local database
 - ✅ **Reliable**: Single file storage, easy to backup
@@ -212,7 +228,8 @@ find backups/ -mtime +7 -delete  # Keep last 7 days
 
 ### Backend
 - **Node.js + Express** - Web server framework
-- **SQLite (better-sqlite3)** - High-performance database
+- **MongoDB + Mongoose** - Cloud database (MongoDB Atlas)
+- **SQLite (better-sqlite3)** - Local development option
 - **Helmet** - Security headers middleware
 - **Express Rate Limit** - API rate limiting
 - **Express Validator** - Input validation and sanitization
