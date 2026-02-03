@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batman Tea - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header-content p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .shop-toggle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: 3px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            background: transparent;
+        }
+
+        .toggle-btn:hover {
+            background: white;
+        }
+
+        .toggle-btn.open {
+            background: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .toggle-btn.open:hover {
+            background: #229954;
+            border-color: #229954;
+        }
+
+        .toggle-btn.closed {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .toggle-btn.closed:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+
+        .status-text {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .booking-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .booking-card:hover {
+            transform: translateX(5px);
+        }
+
+        .booking-card.pending {
+            border-left-color: #f39c12;
+            background: #fff8e6;
+        }
+
+        .booking-card.accepted {
+            border-left-color: #27ae60;
+            background: #e8f8f0;
+        }
+
+        .booking-card.rejected {
+            border-left-color: #e74c3c;
+            background: #ffeaea;
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .booking-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-badge.accepted {
+            background: #27ae60;
+            color: white;
+        }
+
+        .status-badge.rejected {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .booking-details {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .booking-details div {
+            color: #555;
+        }
+
+        .booking-details strong {
+            color: #333;
+            margin-right: 8px;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 0.95em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-accept {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .eta-input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        .notification-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        /* Login Screen Styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-overlay.hidden {
+            display: none;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .login-box .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-box input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .login-box input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-box .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-box .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-box .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-error {
+            background: #ffeaea;
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.authenticated {
+            display: block;
+        }
+
+        .refresh-notice {
+            background: #e3f2fd;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #1976d2;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .shop-hours {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .shop-hours-text {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .shop-hours-text strong {
+            color: #333;
+        }
+
+        .auto-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auto-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .auto-toggle label {
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Mobile-First Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .header-content h1 {
+                font-size: 1.8em;
+            }
+
+            .header-content p {
+                font-size: 0.95em;
+            }
+
+            .shop-toggle {
+                width: 100%;
+            }
+
+            .toggle-btn {
+                width: 100%;
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+
+            .booking-card {
+                padding: 15px;
+            }
+
+            .booking-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .booking-name {
+                font-size: 1.1em;
+            }
+
+            .booking-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn, .eta-input {
+                width: 100%;
+                text-align: center;
+            }
+
+            .notification-form {
+                padding: 15px;
+            }
+
+            .shop-hours {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content h1 {
+                font-size: 1.5em;
+            }
+
+            .stat-card .number {
+                font-size: 2em;
+            }
+
+            .booking-details {
+                font-size: 0.9em;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        .shop-hours {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .shop-hours-text {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .shop-hours-text strong {
+            color: #333;
+        }
+
+        .auto-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auto-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .auto-toggle label {
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Mobile-First Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .header-content h1 {
+                font-size: 1.8em;
+            }
+
+            .header-content p {
+                font-size: 0.95em;
+            }
+
+            .shop-toggle {
+                width: 100%;
+            }
+
+            .toggle-btn {
+                width: 100%;
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5em;
+            }
+
+            .booking-card {
+                padding: 15px;
+            }
+
+            .booking-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .booking-name {
+                font-size: 1.1em;
+            }
+
+            .booking-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn, .eta-input {
+                width: 100%;
+                text-align: center;
+            }
+
+            .notification-form {
+                padding: 15px;
+            }
+
+            .shop-hours {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content h1 {
+                font-size: 1.5em;
+            }
+
+            .stat-card .number {
+                font-size: 2em;
+            }
+
+            .booking-details {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2>🛵 Batman Tea</h2>
+            <p class="subtitle">Dashboard Login</p>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" onkeypress="handleLoginKeypress(event)">
+            </div>
+            <button class="btn-login" id="loginBtn" onclick="handleLogin()">Login</button>
+            <div class="login-error" id="loginError"></div>
+            <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.85em;">Default password: <strong>teatime</strong></p>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden until authenticated) -->
+    <div class="main-content" id="mainContent">
+    <div class="header">
+        <div class="header-content">
+            <h1>🛵 Batman Tea Dashboard</h1>
+            <p>Manage your tea delivery bookings</p>
+        </div>
+        <div class="shop-toggle">
+            <button class="logout-btn" onclick="handleLogout()" style="margin-bottom: 10px;">🚪 Logout</button>
+            <button class="toggle-btn" id="toggleBtn" onclick="toggleShopStatus()">
+                <span id="toggleText">Loading...</span>
+            </button>
+            <div class="status-text" id="statusText"></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Pending Requests</h3>
+            <div class="number" id="pendingCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Accepted Today</h3>
+            <div class="number" id="acceptedCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Requests</h3>
+            <div class="number" id="totalCount">0</div>
+        </div>
+    </div>
+
+    <div class="refresh-notice">
+        🔄 Dashboard auto-refreshes every 5 seconds
+    </div>
+
+    <div class="shop-hours">
+        <div class="shop-hours-text">
+            <strong>⏰ Shop Hours:</strong> <span id="shopHoursDisplay">9:00 AM - 9:00 PM</span>
+        </div>
+        <div class="auto-toggle">
+            <input type="checkbox" id="autoToggle" onchange="toggleAutoMode()">
+            <label for="autoToggle">Auto Open/Close</label>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Booking Requests</h2>
+        <div id="bookingsList"></div>
+    </div>
+
+    <div class="section">
+        <h2>📢 Send Notification to All Customers</h2>
+        <div class="notification-form">
+            <div class="form-group">
+                <label for="notifMessage">Message</label>
+                <textarea id="notifMessage" placeholder="Enter your notification message..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="notifLocation">Current Location (Optional)</label>
+                <input type="text" id="notifLocation" placeholder="e.g., Near Park Street">
+            </div>
+            <button class="btn btn-primary" onclick="sendNotification()">📤 Send Notification</button>
+        </div>
+    </div>
+
+    <script>
+        let bookings = [];
+        let shopIsOpen = true;
+        let autoMode = localStorage.getItem('autoMode') === 'true';
+        const OPEN_HOUR = 9;  // 9 AM
+        const CLOSE_HOUR = 21; // 9 PM
+
+        // Initialize auto mode
+        document.getElementById('autoToggle').checked = autoMode;
+        if (autoMode) {
+            checkAutoSchedule();
+            setInterval(checkAutoSchedule, 60000); // Check every minute
+        }
+
+        function toggleAutoMode() {
+            autoMode = document.getElementById('autoToggle').checked;
+            localStorage.setItem('autoMode', autoMode);
+            
+            if (autoMode) {
+                alert('✅ Auto mode enabled! Shop will open at 9:00 AM and close at 9:00 PM automatically.');
+                checkAutoSchedule();
+            } else {
+                alert('🔴 Auto mode disabled. You can manually control shop status.');
+            }
+        }
+
+        function checkAutoSchedule() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const shouldBeOpen = currentHour >= OPEN_HOUR && currentHour < CLOSE_HOUR;
+            
+            // Only update if status needs to change and we're in auto mode
+            if (autoMode && shouldBeOpen !== shopIsOpen) {
+                shopIsOpen = shouldBeOpen;
+                updateShopStatusOnServer(shouldBeOpen);
+            }
+        }
+
+        async function updateShopStatusOnServer(isOpen) {
+            try {
+                const response = await fetch('http://localhost:3000/api/shop-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isOpen })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    shopIsOpen = isOpen;
+                    updateToggleButton();
+                }
+            } catch (error) {
+                console.error('Error updating shop status:', error);
+            }
+        }
+
+        async function loadBookings() {
+            try {
+                const response = await fetch('http://localhost:3000/api/bookings');
+                bookings = await response.json();
+                
+                // Sort by created date, newest first
+                bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                renderBookings();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        function renderBookings() {
+            const bookingsList = document.getElementById('bookingsList');
+            
+            if (bookings.length === 0) {
+                bookingsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">☕</div>
+                        <div>No booking requests yet. Waiting for customers...</div>
+                    </div>
+                `;
+                return;
+            }
+
+            bookingsList.innerHTML = bookings.map(booking => {
+                const displayLocation = booking.customLocation || booking.location;
+                
+                return `
+                    <div class="booking-card ${booking.status}">
+                        <div class="booking-header">
+                            <div class="booking-name">${booking.name}</div>
+                            <div class="status-badge ${booking.status}">${booking.status}</div>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div><strong>📞 Phone:</strong> ${booking.phone}</div>
+                            <div><strong>📍 Location:</strong> ${displayLocation}</div>
+                            ${booking.notes ? `<div><strong>📝 Notes:</strong> ${booking.notes}</div>` : ''}
+                            ${booking.eta ? `<div><strong>⏱️ ETA:</strong> ${booking.eta}</div>` : ''}
+                            <div><strong>📅 Requested:</strong> ${new Date(booking.createdAt).toLocaleString()}</div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            ${booking.status === 'pending' ? `
+                                <button class="btn btn-accept" onclick="updateBookingStatus(${booking.id}, 'accepted')">
+                                    ✅ Accept
+                                </button>
+                                <button class="btn btn-reject" onclick="updateBookingStatus(${booking.id}, 'rejected')">
+                                    ❌ Reject
+                                </button>
+                            ` : ''}
+                            
+                            ${booking.status === 'accepted' ? `
+                                <input type="text" class="eta-input" id="eta-${booking.id}" placeholder="Add ETA (e.g., 15 mins)" value="${booking.eta || ''}">
+                                <button class="btn btn-primary" onclick="updateETA('${booking.id}')">
+                                    💬 Update ETA
+                                </button>
+                            ` : ''}
+                            
+                            <button class="btn btn-delete" onclick="deleteBooking('${booking.id}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function updateBookingStatus(id, status) {
+            // Find the booking to get phone number
+            const booking = bookings.find(b => b.id == id);
+            if (!booking) return;
+
+            // Optimistic UI update
+            booking.status = status;
+            renderBookings();
+            updateStats();
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status, phone: booking.phone })
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    // Revert on failure
+                    await loadBookings();
+                    alert('Failed to update booking status');
+                }
+            } catch (error) {
+                console.error('Error updating booking:', error);
+                // Revert on error
+                await loadBookings();
+                alert('Failed to update booking status');
+            }
+        }
+
+        async function updateETA(id) {
+            const eta = document.getElementById(`eta-${id}`).value;
+            if (!eta) {
+                alert('Please enter an ETA');
+                return;
+            }
+
+            // Find the booking to get phone number
+            const booking = bookings.find(b => b.id == id);
+            if (!booking) return;
+
+            // Optimistic UI update
+            booking.eta = eta;
+            renderBookings();
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ eta, phone: booking.phone })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Success feedback without blocking alert
+                    const btn = document.querySelector(`button[onclick="updateETA('${id}')"]`);
+                    if (btn) {
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '✅ Updated!';
+                        btn.style.background = '#27ae60';
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.style.background = '';
+                        }, 1500);
+                    }
+                } else {
+                    await loadBookings();
+                }
+            } catch (error) {
+                console.error('Error updating ETA:', error);
+                await loadBookings();
+            }
+        }
+
+        async function deleteBooking(id) {
+            if (!confirm('Are you sure you want to delete this booking?')) {
+                return;
+            }
+
+            // Find the booking to get phone number
+            const booking = bookings.find(b => b.id == id);
+            if (!booking) return;
+
+            // Optimistic UI update
+            const index = bookings.findIndex(b => b.id == id);
+            const deletedBooking = bookings.splice(index, 1)[0];
+            renderBookings();
+            updateStats();
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/bookings/${id}?phone=${encodeURIComponent(booking.phone)}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    // Revert on failure
+                    bookings.splice(index, 0, deletedBooking);
+                    renderBookings();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+                // Revert on error
+                bookings.splice(index, 0, deletedBooking);
+                renderBookings();
+                updateStats();
+            }
+        }
+
+        async function sendNotification() {
+            const message = document.getElementById('notifMessage').value;
+            const location = document.getElementById('notifLocation').value;
+
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+
+            // Disable button during request
+            const btn = event.target;
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/notifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message, location })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    btn.textContent = '✅ Sent!';
+                    btn.style.background = '#27ae60';
+                    document.getElementById('notifMessage').value = '';
+                    document.getElementById('notifLocation').value = '';
+                    
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                btn.textContent = originalText;
+                btn.disabled = false;
+                alert('Failed to send notification');
+            }
+        }
+
+        function updateStats() {
+            const pending = bookings.filter(b => b.status === 'pending').length;
+            const today = new Date().toDateString();
+            const acceptedToday = bookings.filter(b => 
+                b.status === 'accepted' && 
+                new Date(b.createdAt).toDateString() === today
+            ).length;
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('acceptedCount').textContent = acceptedToday;
+            document.getElementById('totalCount').textContent = bookings.length;
+        }
+
+        async function loadShopStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/shop-status');
+                const status = await response.json();
+                shopIsOpen = status.isOpen;
+                updateToggleButton();
+            } catch (error) {
+                console.error('Error loading shop status:', error);
+            }
+        }
+
+        async function toggleShopStatus() {
+            if (autoMode) {
+                if (!confirm('Auto mode is enabled. Do you want to override and manually control the shop status?')) {
+                    return;
+                }
+                // Disable auto mode
+                autoMode = false;
+                document.getElementById('autoToggle').checked = false;
+                localStorage.setItem('autoMode', 'false');
+            }
+
+            const newStatus = !shopIsOpen;
+            try {
+                const response = await fetch('http://localhost:3000/api/shop-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isOpen: newStatus })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    shopIsOpen = newStatus;
+                    updateToggleButton();
+                }
+            } catch (error) {
+                console.error('Error toggling shop status:', error);
+                alert('Failed to update shop status');
+            }
+        }
+
+        function updateToggleButton() {
+            const btn = document.getElementById('toggleBtn');
+            const text = document.getElementById('toggleText');
+            const statusText = document.getElementById('statusText');
+            
+            if (shopIsOpen) {
+                btn.className = 'toggle-btn open';
+                text.textContent = '🟢 OPEN';
+                statusText.textContent = 'Click to close shop';
+            } else {
+                btn.className = 'toggle-btn closed';
+                text.textContent = '🔴 CLOSED';
+                statusText.textContent = 'Click to open shop';
+            }
+        }
+
+        // Load bookings and status on page load and refresh intelligently
+        loadBookings();
+        loadShopStatus();
+        
+        // Use longer intervals to reduce load
+        let refreshInterval = setInterval(() => {
+            if (!document.hidden) { // Only refresh when tab is visible
+                loadBookings();
+                loadShopStatus();
+            }
+        }, 10000); // Changed to 10 seconds
+        
+        // Pause refresh when tab is hidden, resume when visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(refreshInterval);
+            } else {
+                refreshInterval = setInterval(() => {
+                    loadBookings();
+                    loadShopStatus();
+                }, 10000);
+                // Immediate refresh when tab becomes visible
+                loadBookings();
+                loadShopStatus();
+            }
+        });
+    </script>
+    </div> <!-- End main-content -->
+    
+    <script>
+        // Authentication Functions
+        let authToken = localStorage.getItem('dashboardAuthToken');
+
+        async function checkAuthentication() {
+            if (!authToken) {
+                showLoginScreen();
+                return false;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: authToken })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMainContent();
+                    return true;
+                } else {
+                    showLoginScreen();
+                    return false;
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                showLoginScreen();
+                return false;
+            }
+        }
+
+        async function handleLogin() {
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+
+            if (!password) {
+                showLoginError('Please enter a password');
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            errorDiv.classList.remove('show');
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('dashboardAuthToken', authToken);
+                    showMainContent();
+                    document.getElementById('loginPassword').value = '';
+                    
+                    // Start loading data
+                    loadBookings();
+                    loadShopStatus();
+                } else {
+                    showLoginError(data.message || 'Invalid password');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showLoginError('Login failed. Please try again.');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await fetch('http://localhost:3000/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: authToken })
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+
+            authToken = null;
+            localStorage.removeItem('dashboardAuthToken');
+            showLoginScreen();
+        }
+
+        function handleLoginKeypress(event) {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        }
+
+        function showLoginScreen() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('authenticated');
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        function showMainContent() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('authenticated');
+        }
+
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        // Check authentication on page load
+        checkAuthentication();
+    </script>
+</body>
+</html>

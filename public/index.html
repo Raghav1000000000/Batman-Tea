@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batman Tea - Book Your Tea Delivery</title>
+    <style>
+        /* Keyframe Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(102, 126, 234, 0.5), 0 0 10px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 30px rgba(102, 126, 234, 0.5);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .closed-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .closed-message h2 {
+            color: #e74c3c;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .closed-message p {
+            color: #666;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .closed-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header h1::before {
+            content: '🛵';
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .user-info-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info-text {
+            font-size: 0.95em;
+        }
+
+        .user-info-text strong {
+            font-weight: 600;
+        }
+
+        .edit-info-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: transform 0.2s;
+        }
+
+        .edit-info-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .field-locked {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .custom-location {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        .success-message::before {
+            content: '🎉 ';
+            font-size: 1.5em;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            animation: shake 0.5s ease-out;
+        }
+
+        .notifications {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .notifications h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .notification-item {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            animation: slideInRight 0.5s ease-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .notification-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-time {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .my-bookings {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .my-bookings h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .booking-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            animation: fadeInUp 0.5s ease-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .booking-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .booking-item.pending {
+            border-left-color: #f39c12;
+            background: #fff8e6;
+            animation: fadeInUp 0.5s ease-out, pulse 2s ease-in-out infinite;
+        }
+
+        .booking-item.accepted {
+            border-left-color: #27ae60;
+            background: #e8f8f0;
+        }
+
+        .booking-item.rejected {
+            border-left-color: #e74c3c;
+            background: #ffeaea;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Confetti Effect */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            position: absolute;
+            animation: confetti 3s ease-out forwards;
+        }
+
+        /* Input Focus Effects */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .booking-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .booking-status.pending {
+            background: #f39c12;
+            color: white;
+        }
+
+        .booking-status.accepted {
+            background: #27ae60;
+            color: white;
+        }
+
+        .booking-status.rejected {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .booking-details {
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .booking-details strong {
+            color: #333;
+        }
+
+        .eta-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .no-bookings {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        /* Mobile-First Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .user-info-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .edit-info-btn {
+                width: 100%;
+            }
+
+            input, select, textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .btn {
+                padding: 14px;
+                font-size: 1em;
+            }
+
+            .booking-item {
+                padding: 12px;
+            }
+
+            .notification-item {
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            label {
+                font-size: 0.9em;
+            }
+
+            .booking-details,
+            .notification-item {
+                font-size: 0.9em;
+            }
+
+            .eta-badge {
+                font-size: 0.9em;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Touch-friendly enhancements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 48px;
+            }
+
+            .edit-info-btn {
+                min-height: 44px;
+            }
+
+            input, select, textarea {
+                min-height: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛵 Batman Tea</h1>
+            <p>Fresh tea delivered to your location!</p>
+        </div>
+
+        <div class="user-info-banner" id="userInfoBanner" style="display: none;">
+            <div class="user-info-text">
+                <div>👤 <strong id="savedName"></strong></div>
+                <div>📞 <strong id="savedPhone"></strong></div>
+            </div>
+            <button class="edit-info-btn" onclick="enableEditMode()">✏️ Edit Info</button>
+        </div>
+
+        <form id="bookingForm">
+            <div class="form-group">
+                <label for="name">Your Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="Enter your name">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="location">Location <span class="required">*</span></label>
+                <select id="location" name="location" required>
+                    <option value="">Select a location</option>
+                    <option value="Office Complex A">Office Complex A</option>
+                    <option value="Park Street">Park Street</option>
+                    <option value="Market Square">Market Square</option>
+                    <option value="University Campus">University Campus</option>
+                    <option value="Residential Area B">Residential Area B</option>
+                    <option value="custom">Other (Custom Location)</option>
+                </select>
+                <input type="text" id="customLocation" class="custom-location" placeholder="Enter your custom location">
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Additional Notes</label>
+                <textarea id="notes" name="notes" placeholder="Any special requests or instructions..."></textarea>
+            </div>
+
+            <button type="submit" class="btn">📞 Request Tea Delivery</button>
+        </form>
+
+        <div class="success-message" id="successMessage">
+            ✅ Your tea booking has been sent! The tea man will confirm shortly.
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            ❌ Something went wrong. Please try again.
+        </div>
+
+        <div class="loading" id="loadingSpinner">
+            <div class="spinner"></div>
+            <div class="loading-text">Sending your request...</div>
+        </div>
+
+        <div class="my-bookings" id="myBookingsSection" style="display: none;">
+            <h3>📋 My Bookings</h3>
+            <div id="myBookingsList"></div>
+        </div>
+
+        <div class="notifications" id="notificationsSection" style="display: none;">
+            <h3>📢 Latest Updates</h3>
+            <div id="notificationsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('bookingForm');
+        const locationSelect = document.getElementById('location');
+        const customLocationInput = document.getElementById('customLocation');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const notificationsSection = document.getElementById('notificationsSection');
+        const notificationsList = document.getElementById('notificationsList');
+        const myBookingsSection = document.getElementById('myBookingsSection');
+        const myBookingsList = document.getElementById('myBookingsList');
+        const userInfoBanner = document.getElementById('userInfoBanner');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Confetti celebration
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#ffd700', '#ff6b6b', '#4ecdc4'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // Add input animations
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transition = 'all 0.3s ease';
+            });
+        });
+        const nameInput = document.getElementById('name');
+        const phoneInput = document.getElementById('phone');
+
+        // Get customer info from localStorage
+        let customerPhone = localStorage.getItem('customerPhone') || null;
+        let customerName = localStorage.getItem('customerName') || null;
+        let editMode = false;
+
+        // Initialize user session
+        function initializeUserSession() {
+            if (customerName && customerPhone) {
+                // User has saved info - show banner and pre-fill
+                document.getElementById('savedName').textContent = customerName;
+                document.getElementById('savedPhone').textContent = customerPhone;
+                userInfoBanner.style.display = 'flex';
+                
+                // Pre-fill and lock fields
+                nameInput.value = customerName;
+                phoneInput.value = customerPhone;
+                nameInput.readOnly = true;
+                phoneInput.readOnly = true;
+                nameInput.classList.add('field-locked');
+                phoneInput.classList.add('field-locked');
+            }
+        }
+
+        // Enable edit mode
+        function enableEditMode() {
+            editMode = true;
+            nameInput.readOnly = false;
+            phoneInput.readOnly = false;
+            nameInput.classList.remove('field-locked');
+            phoneInput.classList.remove('field-locked');
+            nameInput.focus();
+            userInfoBanner.querySelector('.edit-info-btn').textContent = '💾 Save Info';
+            userInfoBanner.querySelector('.edit-info-btn').onclick = saveEditedInfo;
+        }
+
+        // Save edited info
+        function saveEditedInfo() {
+            const newName = nameInput.value.trim();
+            const newPhone = phoneInput.value.trim();
+            
+            if (newName && newPhone) {
+                customerName = newName;
+                customerPhone = newPhone;
+                localStorage.setItem('customerName', customerName);
+                localStorage.setItem('customerPhone', customerPhone);
+                
+                // Update banner
+                document.getElementById('savedName').textContent = customerName;
+                document.getElementById('savedPhone').textContent = customerPhone;
+                
+                // Lock fields again
+                nameInput.readOnly = true;
+                phoneInput.readOnly = true;
+                nameInput.classList.add('field-locked');
+                phoneInput.classList.add('field-locked');
+                
+                userInfoBanner.querySelector('.edit-info-btn').textContent = '✏️ Edit Info';
+                userInfoBanner.querySelector('.edit-info-btn').onclick = enableEditMode;
+                editMode = false;
+                
+                // Reload bookings with new phone
+                loadMyBookings();
+            }
+        }
+
+        // Initialize on page load
+        initializeUserSession();
+
+        // Check shop status
+        async function checkShopStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/shop-status');
+                const status = await response.json();
+                
+                if (!status.isOpen) {
+                    document.querySelector('.container').innerHTML = `
+                        <div class="closed-message">
+                            <div class="closed-icon">🚫</div>
+                            <h2>Currently Closed</h2>
+                            <p>Sorry, Batman Tea is not accepting orders right now.</p>
+                            <p style="margin-top: 20px;">Please check back later!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error checking shop status:', error);
+            }
+        }
+
+        // Check status on load and every 10 seconds
+        checkShopStatus();
+        setInterval(checkShopStatus, 10000);
+
+        // Show custom location input when "Other" is selected
+        locationSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customLocationInput.style.display = 'block';
+                customLocationInput.required = true;
+            } else {
+                customLocationInput.style.display = 'none';
+                customLocationInput.required = false;
+                customLocationInput.value = '';
+            }
+        });
+
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            const submitBtn = form.querySelector('.btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Sending...';
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                location: locationSelect.value === 'custom' ? 'Custom' : locationSelect.value,
+                customLocation: customLocationInput.value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Hide loading
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Confetti celebration!
+                    createConfetti();
+                    
+                    // Save customer info for future bookings
+                    customerName = formData.name;
+                    customerPhone = formData.phone;
+                    localStorage.setItem('customerName', customerName);
+                    localStorage.setItem('customerPhone', customerPhone);
+
+                    // Update UI
+                    if (!userInfoBanner.style.display || userInfoBanner.style.display === 'none') {
+                        document.getElementById('savedName').textContent = customerName;
+                        document.getElementById('savedPhone').textContent = customerPhone;
+                        userInfoBanner.style.display = 'flex';
+                    }
+
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    form.reset();
+                    
+                    // Re-initialize session (locks fields)
+                    initializeUserSession();
+                    
+                    // Load bookings to show the new one
+                    loadMyBookings();
+                    
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error('Booking failed');
+                }
+            } catch (error) {
+                loadingSpinner.style.display = 'none';
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Load notifications
+        async function loadNotifications() {
+            try {
+                const response = await fetch('http://localhost:3000/api/notifications');
+                const notifications = await response.json();
+                
+                if (notifications.length > 0) {
+                    notificationsSection.style.display = 'block';
+                    notificationsList.innerHTML = notifications.map(notif => `
+                        <div class="notification-item">
+                            <div>${notif.message}</div>
+                            ${notif.location ? `<div style="font-weight: 600; margin-top: 5px;">📍 ${notif.location}</div>` : ''}
+                            <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        // Load customer's bookings
+        async function loadMyBookings() {
+            if (!customerPhone) {
+                myBookingsSection.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/bookings');
+                const allBookings = await response.json();
+                
+                // Filter bookings by customer phone
+                const myBookings = allBookings.filter(b => b.phone === customerPhone);
+                
+                if (myBookings.length > 0) {
+                    myBookingsSection.style.display = 'block';
+                    
+                    myBookingsList.innerHTML = myBookings.map(booking => {
+                        const displayLocation = booking.customLocation || booking.location;
+                        const createdDate = new Date(booking.createdAt).toLocaleString();
+                        
+                        return `
+                            <div class="booking-item ${booking.status}">
+                                <div class="booking-status ${booking.status}">${booking.status}</div>
+                                <div class="booking-details">
+                                    <div><strong>📍 Location:</strong> ${displayLocation}</div>
+                                    ${booking.notes ? `<div><strong>📝 Notes:</strong> ${booking.notes}</div>` : ''}
+                                    <div><strong>📅 Requested:</strong> ${createdDate}</div>
+                                    ${booking.eta ? `<div class="eta-badge">⏱️ ETA: ${booking.eta}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    myBookingsSection.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading my bookings:', error);
+            }
+        }
+
+        // Load notifications on page load and refresh intelligently
+        loadNotifications();
+        loadMyBookings();
+        
+        // Use longer intervals and pause when tab is hidden
+        let notifInterval = setInterval(() => {
+            if (!document.hidden) {
+                loadNotifications();
+                loadMyBookings();
+            }
+        }, 10000); // Changed to 10 seconds
+        
+        // Pause refresh when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(notifInterval);
+            } else {
+                notifInterval = setInterval(() => {
+                    loadNotifications();
+                    loadMyBookings();
+                }, 10000);
+                // Immediate refresh when tab becomes visible
+                loadNotifications();
+                loadMyBookings();
+            }
+        });
+    </script>
+</body>
+</html>

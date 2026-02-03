@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.log
+.DS_Store
+batman-tea.db
+batman-tea.db-shm
+batman-tea.db-wal
+
+# Vercel
+.vercel
