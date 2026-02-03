@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const morgan = require('morgan');
 const fs = require('fs');
-const db = require('./database');
+const db = require('./database-mongo'); // Changed to MongoDB
 
 const app = express();
 const PORT = process.env.PORT || 3000;
