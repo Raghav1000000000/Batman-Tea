@@ -65,6 +65,11 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
+    // In production, if ALLOWED_ORIGINS not set, allow all (will be configured later)
+    if (!process.env.ALLOWED_ORIGINS && NODE_ENV === 'production') {
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === 'development') {
       callback(null, true);
     } else {
