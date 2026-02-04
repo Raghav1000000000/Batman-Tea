@@ -15,8 +15,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Initialize database
-db.initializeDatabase();
+// Initialize database (non-blocking)
+db.initializeDatabase().catch(err => {
+  console.error('❌ Database initialization failed:', err.message);
+  console.log('⚠️  Server will continue but database operations may fail');
+});
 
 // Schedule daily cleanup at midnight (00:00)
 cron.schedule('0 0 * * *', async () => {
@@ -161,6 +164,19 @@ const transformMongoDoc = (doc) => {
   }
   return transformed;
 };
+
+// Health check endpoint
+app.get('/api/health', async (req, res) => {
+  const mongoose = require('mongoose');
+  const health = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: NODE_ENV
+  };
+  res.json(health);
+});
 
 // Middleware
 
