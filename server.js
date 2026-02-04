@@ -21,15 +21,18 @@ db.initializeDatabase().catch(err => {
   console.log('⚠️  Server will continue but database operations may fail');
 });
 
-// Schedule daily cleanup at midnight (00:00)
-cron.schedule('0 0 * * *', async () => {
-  console.log('🕛 Running daily cleanup task...');
-  await db.cleanupOldBookings();
-}, {
-  timezone: "Asia/Kolkata" // Adjust to your timezone
-});
-
-console.log('⏰ Daily cleanup scheduled for midnight');
+// Schedule daily cleanup at midnight (00:00) - Only in non-serverless environments
+if (process.env.VERCEL !== '1') {
+  cron.schedule('0 0 * * *', async () => {
+    console.log('🕛 Running daily cleanup task...');
+    await db.cleanupOldBookings();
+  }, {
+    timezone: "Asia/Kolkata"
+  });
+  console.log('⏰ Daily cleanup scheduled for midnight');
+} else {
+  console.log('⏰ Cron jobs disabled in serverless environment');
+}
 
 // Security Middleware
 app.use(helmet({

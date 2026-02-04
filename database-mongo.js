@@ -15,8 +15,9 @@ async function connectToDatabase() {
 
   try {
     await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      serverSelectionTimeoutMS: 3000, // Fail fast after 3 seconds
+      socketTimeoutMS: 10000, // Close sockets after 10 seconds
+      maxPoolSize: 10,
     });
     isConnected = true;
     console.log('✅ MongoDB connected successfully!');
