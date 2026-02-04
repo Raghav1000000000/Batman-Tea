@@ -16,6 +16,10 @@
       "dest": "server.js"
     },
     {
+      "src": "/today",
+      "dest": "server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "server.js"
     }
