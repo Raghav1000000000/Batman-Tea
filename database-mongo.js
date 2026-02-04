@@ -26,19 +26,28 @@ async function connectToDatabase() {
 
 // Schemas
 const bookingSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  phone: { type: String, required: true, index: true },
-  location: { type: String, required: true },
-  customLocation: String,
-  notes: String,
-  status: { type: String, default: 'pending', index: true },
-  eta: String,
+  name: { type: String, required: true, trim: true },
+  phone: { type: String, required: true, trim: true, index: true },
+  location: { type: String, required: true, trim: true },
+  customLocation: { type: String, trim: true },
+  notes: { type: String, trim: true },
+  status: { 
+    type: String, 
+    default: 'pending', 
+    enum: ['pending', 'accepted', 'rejected', 'completed'],
+    index: true 
+  },
+  eta: { type: String, trim: true },
   createdAt: { type: Date, default: Date.now, index: true }
 });
 
+// Compound index for efficient queries
+bookingSchema.index({ status: 1, createdAt: -1 });
+bookingSchema.index({ phone: 1, createdAt: -1 });
+
 const notificationSchema = new mongoose.Schema({
-  message: { type: String, required: true },
-  location: String,
+  message: { type: String, required: true, trim: true },
+  location: { type: String, trim: true },
   createdAt: { type: Date, default: Date.now, index: true }
 });
 
@@ -48,10 +57,13 @@ const settingSchema = new mongoose.Schema({
 });
 
 const authTokenSchema = new mongoose.Schema({
-  token: { type: String, required: true, unique: true },
+  token: { type: String, required: true, unique: true, index: true },
   createdAt: { type: Date, default: Date.now },
-  expiresAt: { type: Date, required: true, index: true }
+  expiresAt: { type: Date, required: true }
 });
+
+// TTL index to automatically delete expired tokens after they expire
+authTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Models
 const Booking = mongoose.model('Booking', bookingSchema);
@@ -113,9 +125,10 @@ async function updateBooking(id, phone, updates) {
   return booking;
 }
 
-async function deleteBooking(id) {
+async function deleteBooking(id, phone) {
   await connectToDatabase();
-  const result = await Booking.findByIdAndDelete(id);
+  const query = phone ? { _id: id, phone } : { _id: id };
+  const result = await Booking.findOneAndDelete(query);
   return result !== null;
 }
 
@@ -128,10 +141,26 @@ async function getNotifications(limit = 10) {
     .lean();
 }
 
-async function createNotification(message, location = null) {
+async function createNotification(notificationData) {
   await connectToDatabase();
-  const notification = await Notification.create({ message, location });
+  const notification = await Notification.create(notificationData);
   return notification.toObject();
+}
+
+async function updateNotification(id, updates) {
+  await connectToDatabase();
+  const notification = await Notification.findByIdAndUpdate(
+    id,
+    { $set: updates },
+    { new: true }
+  ).lean();
+  return notification;
+}
+
+async function deleteNotification(id) {
+  await connectToDatabase();
+  const result = await Notification.findByIdAndDelete(id);
+  return result !== null;
 }
 
 // Shop status functions
@@ -236,6 +265,29 @@ async function updateAdminPassword(newPassword) {
   }
 }
 
+// Daily cleanup function - remove old bookings
+async function cleanupOldBookings() {
+  try {
+    await connectToDatabase();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
+    // Delete completed or rejected bookings older than 1 day
+    const result = await Booking.deleteMany({
+      status: { $in: ['completed', 'rejected'] },
+      createdAt: { $lt: oneDayAgo }
+    });
+    
+    if (result.deletedCount > 0) {
+      console.log(`🧹 Daily cleanup: Removed ${result.deletedCount} old bookings`);
+    }
+    
+    return result.deletedCount;
+  } catch (error) {
+    console.error('Error during cleanup:', error.message);
+    return 0;
+  }
+}
+
 // Graceful shutdown
 process.on('SIGINT', async () => {
   await mongoose.connection.close();
@@ -251,11 +303,14 @@ module.exports = {
   deleteBooking,
   getNotifications,
   createNotification,
+  updateNotification,
+  deleteNotification,
   getShopStatus,
   updateShopStatus,
   createAuthToken,
   verifyAuthToken,
   deleteAuthToken,
   verifyAdminPassword,
-  updateAdminPassword
+  updateAdminPassword,
+  cleanupOldBookings
 };

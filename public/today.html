@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <title>🛵☕ Today's Orders - Batman Tea</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f6fa;
+            padding: 12px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 30px;
+                border-radius: 15px;
+                margin-bottom: 30px;
+            }
+        }
+
+        .header-title h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        @media (min-width: 768px) {
+            .header-title h1 {
+                font-size: 2em;
+            }
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            min-height: 48px;
+            font-size: 0.95em;
+        }
+
+        .btn-full {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-full:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-logout:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-card {
+                padding: 25px;
+                border-radius: 15px;
+            }
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .section {
+                padding: 30px;
+                border-radius: 15px;
+                margin-bottom: 30px;
+            }
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .booking-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #f39c12;
+        }
+
+        .booking-card.accepted {
+            border-left-color: #27ae60;
+            background: #e8f8f0;
+        }
+
+        .booking-card.rejected {
+            border-left-color: #e74c3c;
+            background: #ffeaea;
+        }
+
+        .booking-card.completed {
+            border-left-color: #3498db;
+            background: #e8f4fc;
+            opacity: 0.85;
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .booking-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending { background: #f39c12; color: white; }
+        .status-badge.accepted { background: #27ae60; color: white; }
+        .status-badge.rejected { background: #e74c3c; color: white; }
+        .status-badge.completed { background: #3498db; color: white; }
+
+        .booking-details {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .booking-actions .btn {
+            padding: 10px 20px;
+            font-size: 0.95em;
+        }
+
+        .btn-accept { background: #27ae60; color: white; }
+        .btn-reject { background: #e74c3c; color: white; }
+        .btn-complete { background: #3498db; color: white; }
+        .btn-delete { background: #95a5a6; color: white; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .eta-input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        .notification-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .notification-message {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .notification-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .shop-toggle {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 56px;
+        }
+
+        .toggle-btn.open {
+            background: #27ae60;
+            color: white;
+        }
+
+        .toggle-btn.closed {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .status-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .action-card h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h1>🛵☕ Today's Overview</h1>
+            <p>Quick view of today's bookings and shop status</p>
+        </div>
+        <div class="header-actions">
+            <a href="/dashboard" class="btn btn-full">📊 Full Dashboard</a>
+            <button class="btn btn-logout" onclick="handleLogout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <h3>⏳ Pending</h3>
+            <div class="number" id="pendingCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>✅ Accepted</h3>
+            <div class="number" id="acceptedCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>✔️ Completed</h3>
+            <div class="number" id="completedCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>📋 Total Today</h3>
+            <div class="number" id="totalCount">0</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔘 Shop Status</h2>
+        <div class="shop-toggle">
+            <button class="toggle-btn" id="toggleBtn" onclick="toggleShopStatus()">
+                <span id="toggleText">Loading...</span>
+            </button>
+            <div class="status-text" id="statusText"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Today's Bookings</h2>
+        <div id="bookingsList"></div>
+    </div>
+
+    <div class="section">
+        <h2>📢 Recent Notifications</h2>
+        <div id="notificationsList"></div>
+    </div>
+
+    <script>
+        let bookings = [];
+        let notifications = [];
+        let shopIsOpen = true;
+
+        // Helper function to transform MongoDB _id to id
+        const transformMongoDoc = (doc) => {
+            if (!doc) return null;
+            if (Array.isArray(doc)) return doc.map(transformMongoDoc);
+            const transformed = { ...doc };
+            if (transformed._id) {
+                transformed.id = transformed._id.toString();
+                delete transformed._id;
+            }
+            return transformed;
+        };
+
+        async function loadTodayBookings() {
+            try {
+                const response = await fetch('http://localhost:3000/api/bookings');
+                const allBookings = await response.json();
+                
+                // Filter only today's bookings
+                const today = new Date().toDateString();
+                bookings = allBookings.filter(b => 
+                    new Date(b.createdAt).toDateString() === today
+                );
+                
+                renderBookings();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        function renderBookings() {
+            const bookingsList = document.getElementById('bookingsList');
+            
+            if (bookings.length === 0) {
+                bookingsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">☕</div>
+                        <div>No bookings yet today. Waiting for customers...</div>
+                    </div>
+                `;
+                return;
+            }
+
+            bookingsList.innerHTML = bookings.map(booking => {
+                const displayLocation = booking.customLocation || booking.location;
+                
+                return `
+                    <div class="booking-card ${booking.status}">
+                        <div class="booking-header">
+                            <div class="booking-name">${booking.name}</div>
+                            <div class="status-badge ${booking.status}">${booking.status}</div>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div><strong>📞 Phone:</strong> ${booking.phone}</div>
+                            <div><strong>📍 Location:</strong> ${displayLocation}</div>
+                            ${booking.notes ? `<div><strong>📝 Notes:</strong> ${booking.notes}</div>` : ''}
+                            ${booking.eta ? `<div><strong>⏱️ ETA:</strong> ${booking.eta}</div>` : ''}
+                            <div><strong>📅 Time:</strong> ${new Date(booking.createdAt).toLocaleTimeString()}</div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            ${booking.status === 'pending' ? `
+                                <button class="btn btn-accept" onclick="updateBookingStatus('${booking.id}', 'accepted')">
+                                    ✅ Accept
+                                </button>
+                                <button class="btn btn-reject" onclick="updateBookingStatus('${booking.id}', 'rejected')">
+                                    ❌ Reject
+                                </button>
+                            ` : ''}
+                            
+                            ${booking.status === 'accepted' ? `
+                                <input type="text" class="eta-input" id="eta-${booking.id}" placeholder="Add ETA" value="${booking.eta || ''}">
+                                <button class="btn btn-primary" onclick="updateETA('${booking.id}')">
+                                    💬 Update ETA
+                                </button>
+                                <button class="btn btn-complete" onclick="updateBookingStatus('${booking.id}', 'completed')">
+                                    ✔️ Complete
+                                </button>
+                            ` : ''}
+                            
+                            <button class="btn btn-delete" onclick="deleteBooking('${booking.id}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function updateBookingStatus(id, status) {
+            const booking = bookings.find(b => b.id == id);
+            if (!booking) return;
+
+            booking.status = status;
+            renderBookings();
+            updateStats();
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, phone: booking.phone })
+                });
+
+                if (!response.ok) {
+                    await loadTodayBookings();
+                }
+            } catch (error) {
+                console.error('Error updating booking:', error);
+                await loadTodayBookings();
+            }
+        }
+
+        async function updateETA(id) {
+            const booking = bookings.find(b => b.id == id);
+            if (!booking) return;
+
+            const eta = document.getElementById(`eta-${id}`).value;
+            
+            try {
+                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eta, phone: booking.phone })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    booking.eta = eta;
+                    renderBookings();
+                }
+            } catch (error) {
+                console.error('Error updating ETA:', error);
+            }
+        }
+
+        async function deleteBooking(id) {
+            if (!confirm('Are you sure you want to delete this booking?')) {
+                return;
+            }
+
+            const booking = bookings.find(b => b.id == id);
+            if (!booking) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/bookings/${id}?phone=${encodeURIComponent(booking.phone)}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    await loadTodayBookings();
+                }
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+            }
+        }
+
+        function updateStats() {
+            const pending = bookings.filter(b => b.status === 'pending').length;
+            const accepted = bookings.filter(b => b.status === 'accepted').length;
+            const completed = bookings.filter(b => b.status === 'completed').length;
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('acceptedCount').textContent = accepted;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('totalCount').textContent = bookings.length;
+        }
+
+        async function loadShopStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/shop-status');
+                const status = await response.json();
+                shopIsOpen = status.isOpen;
+                updateToggleButton();
+            } catch (error) {
+                console.error('Error loading shop status:', error);
+            }
+        }
+
+        function updateToggleButton() {
+            const btn = document.getElementById('toggleBtn');
+            const text = document.getElementById('toggleText');
+            const statusText = document.getElementById('statusText');
+
+            if (shopIsOpen) {
+                btn.className = 'toggle-btn open';
+                text.textContent = '🟢 Shop is OPEN';
+                statusText.innerHTML = '✅ Accepting new bookings';
+            } else {
+                btn.className = 'toggle-btn closed';
+                text.textContent = '🔴 Shop is CLOSED';
+                statusText.innerHTML = '🚫 Not accepting bookings';
+            }
+        }
+
+        async function toggleShopStatus() {
+            shopIsOpen = !shopIsOpen;
+            updateToggleButton();
+
+            try {
+                await fetch('http://localhost:3000/api/shop-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isOpen: shopIsOpen })
+                });
+            } catch (error) {
+                console.error('Error updating shop status:', error);
+                shopIsOpen = !shopIsOpen;
+                updateToggleButton();
+            }
+        }
+
+        async function loadNotifications() {
+            try {
+                const response = await fetch('http://localhost:3000/api/notifications');
+                notifications = await response.json();
+                renderNotifications();
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        function renderNotifications() {
+            const notificationsList = document.getElementById('notificationsList');
+            
+            if (!notifications || notifications.length === 0) {
+                notificationsList.innerHTML = `
+                    <div class="empty-state">
+                        <div>📭 No notifications</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show only last 3 notifications
+            const recentNotifs = notifications.slice(0, 3);
+
+            notificationsList.innerHTML = recentNotifs.map(notif => `
+                <div class="notification-card">
+                    <div class="notification-message">${notif.message}</div>
+                    ${notif.location ? `<div class="notification-meta"><strong>📍 Location:</strong> ${notif.location}</div>` : ''}
+                    <div class="notification-meta">
+                        <span><strong>📅 Sent:</strong> ${new Date(notif.createdAt).toLocaleString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function handleLogout() {
+            const token = localStorage.getItem('dashboardAuthToken');
+            
+            try {
+                await fetch('http://localhost:3000/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            localStorage.removeItem('dashboardAuthToken');
+            window.location.href = '/dashboard';
+        }
+
+        // Initialize
+        loadTodayBookings();
+        loadShopStatus();
+        loadNotifications();
+
+        // Auto-refresh every 10 seconds
+        setInterval(() => {
+            loadTodayBookings();
+            loadShopStatus();
+        }, 10000);
+    </script>
+</body>
+</html>

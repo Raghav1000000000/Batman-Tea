@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const morgan = require('morgan');
 const fs = require('fs');
+const cron = require('node-cron');
 const db = require('./database-mongo'); // Changed to MongoDB
 
 const app = express();
@@ -17,12 +18,23 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // Initialize database
 db.initializeDatabase();
 
+// Schedule daily cleanup at midnight (00:00)
+cron.schedule('0 0 * * *', async () => {
+  console.log('🕛 Running daily cleanup task...');
+  await db.cleanupOldBookings();
+}, {
+  timezone: "Asia/Kolkata" // Adjust to your timezone
+});
+
+console.log('⏰ Daily cleanup scheduled for midnight');
+
 // Security Middleware
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for our app
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-hashes'"], // Allow inline scripts and event handlers
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers (onclick, etc.)
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:"],
     },
@@ -138,20 +150,35 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+// Helper function to transform MongoDB _id to id for frontend
+const transformMongoDoc = (doc) => {
+  if (!doc) return null;
+  if (Array.isArray(doc)) return doc.map(transformMongoDoc);
+  const transformed = { ...doc };
+  if (transformed._id) {
+    transformed.id = transformed._id.toString();
+    delete transformed._id;
+  }
+  return transformed;
+};
+
 // Middleware
 
 // Get all bookings
-app.get('/api/bookings', (req, res) => {
+app.get('/api/bookings', async (req, res) => {
   try {
-    const bookings = db.getAllBookings();
-    res.json(bookings);
+    const bookings = await db.getAllBookings();
+    // Transform and ensure we always return an array
+    const transformed = transformMongoDoc(bookings);
+    res.json(Array.isArray(transformed) ? transformed : []);
   } catch (error) {
+    console.error('Error fetching bookings:', error);
     res.status(500).json({ success: false, message: 'Error fetching bookings' });
   }
 });
 
 // Create new booking
-app.post('/api/bookings', validateBooking, handleValidationErrors, (req, res) => {
+app.post('/api/bookings', validateBooking, handleValidationErrors, async (req, res) => {
   try {
     const bookingData = {
       name: req.body.name,
@@ -161,15 +188,16 @@ app.post('/api/bookings', validateBooking, handleValidationErrors, (req, res) =>
       notes: req.body.notes
     };
     
-    const booking = db.createBooking(bookingData);
-    res.json({ success: true, booking });
+    const booking = await db.createBooking(bookingData);
+    res.json({ success: true, booking: transformMongoDoc(booking) });
   } catch (error) {
+    console.error('Error creating booking:', error);
     res.status(500).json({ success: false, message: 'Error creating booking' });
   }
 });
 
 // Update booking status
-app.put('/api/bookings/:id', (req, res) => {
+app.put('/api/bookings/:id', async (req, res) => {
   try {
     const phone = req.body.phone || req.query.phone;
     const updates = {
@@ -177,59 +205,100 @@ app.put('/api/bookings/:id', (req, res) => {
       eta: req.body.eta
     };
     
-    const booking = db.updateBooking(req.params.id, phone, updates);
+    const booking = await db.updateBooking(req.params.id, phone, updates);
     if (booking) {
-      res.json({ success: true, booking });
+      res.json({ success: true, booking: transformMongoDoc(booking) });
     } else {
       res.status(404).json({ success: false, message: 'Booking not found' });
     }
   } catch (error) {
+    console.error('Error updating booking:', error);
     res.status(500).json({ success: false, message: 'Error updating booking' });
   }
 });
 
 // Delete booking
-app.delete('/api/bookings/:id', (req, res) => {
+app.delete('/api/bookings/:id', async (req, res) => {
   try {
     const phone = req.query.phone;
-    const success = db.deleteBooking(req.params.id, phone);
+    const success = await db.deleteBooking(req.params.id, phone);
     if (success) {
       res.json({ success: true });
     } else {
       res.status(404).json({ success: false, message: 'Booking not found' });
     }
   } catch (error) {
+    console.error('Error deleting booking:', error);
     res.status(500).json({ success: false, message: 'Error deleting booking' });
   }
 });
 
 // Get notifications
-app.get('/api/notifications', (req, res) => {
+app.get('/api/notifications', async (req, res) => {
   try {
-    const notifications = db.getNotifications(20);
-    res.json(notifications);
+    const notifications = await db.getNotifications(20);
+    const transformed = transformMongoDoc(notifications);
+    const notificationsArray = Array.isArray(transformed) ? transformed : [];
+    res.json(notificationsArray);
   } catch (error) {
+    console.error('Error fetching notifications:', error);
     res.status(500).json({ success: false, message: 'Error fetching notifications' });
   }
 });
 
 // Create notification
-app.post('/api/notifications', validateNotification, handleValidationErrors, (req, res) => {
+app.post('/api/notifications', validateNotification, handleValidationErrors, async (req, res) => {
   try {
     const notificationData = {
       message: req.body.message,
       location: req.body.location
     };
     
-    const notification = db.createNotification(notificationData);
-    res.json({ success: true, notification });
+    const notification = await db.createNotification(notificationData);
+    res.json({ success: true, notification: transformMongoDoc(notification) });
   } catch (error) {
+    console.error('Error creating notification:', error);
     res.status(500).json({ success: false, message: 'Error creating notification' });
   }
 });
 
+// Update notification
+app.put('/api/notifications/:id', async (req, res) => {
+  try {
+    const updates = {
+      message: req.body.message,
+      location: req.body.location
+    };
+    
+    const notification = await db.updateNotification(req.params.id, updates);
+    if (notification) {
+      res.json({ success: true, notification: transformMongoDoc(notification) });
+    } else {
+      res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error updating notification:', error);
+    res.status(500).json({ success: false, message: 'Error updating notification' });
+  }
+});
+
+// Delete notification
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    const success = await db.deleteNotification(req.params.id);
+    if (success) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ success: false, message: 'Error deleting notification' });
+  }
+});
+
 // Authentication endpoints
-app.post('/api/auth/login', authLimiter, validatePassword, handleValidationErrors, (req, res) => {
+app.post('/api/auth/login', authLimiter, validatePassword, handleValidationErrors, async (req, res) => {
   try {
     const { password } = req.body;
     
@@ -237,20 +306,21 @@ app.post('/api/auth/login', authLimiter, validatePassword, handleValidationError
       return res.status(400).json({ success: false, message: 'Password is required' });
     }
     
-    const isValid = db.verifyAdminPassword(password);
+    const isValid = await db.verifyAdminPassword(password);
     
     if (!isValid) {
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
     
-    const token = db.createAuthToken();
+    const token = await db.createAuthToken();
     res.json({ success: true, token });
   } catch (error) {
+    console.error('Error during login:', error);
     res.status(500).json({ success: false, message: 'Error during login' });
   }
 });
 
-app.post('/api/auth/verify', (req, res) => {
+app.post('/api/auth/verify', async (req, res) => {
   try {
     const { token } = req.body;
     
@@ -258,28 +328,30 @@ app.post('/api/auth/verify', (req, res) => {
       return res.status(400).json({ success: false, message: 'Token is required' });
     }
     
-    const isValid = db.verifyAuthToken(token);
+    const isValid = await db.verifyAuthToken(token);
     res.json({ success: isValid });
   } catch (error) {
+    console.error('Error verifying token:', error);
     res.status(500).json({ success: false, message: 'Error verifying token' });
   }
 });
 
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', async (req, res) => {
   try {
     const { token } = req.body;
     
     if (token) {
-      db.deleteAuthToken(token);
+      await db.deleteAuthToken(token);
     }
     
     res.json({ success: true });
   } catch (error) {
+    console.error('Error during logout:', error);
     res.status(500).json({ success: false, message: 'Error during logout' });
   }
 });
 
-app.post('/api/auth/change-password', validatePasswordChange, handleValidationErrors, (req, res) => {
+app.post('/api/auth/change-password', validatePasswordChange, handleValidationErrors, async (req, res) => {
   try {
     const { token, currentPassword, newPassword } = req.body;
     
@@ -288,44 +360,47 @@ app.post('/api/auth/change-password', validatePasswordChange, handleValidationEr
     }
     
     // Verify token first
-    const isTokenValid = db.verifyAuthToken(token);
+    const isTokenValid = await db.verifyAuthToken(token);
     if (!isTokenValid) {
       return res.status(401).json({ success: false, message: 'Invalid or expired token' });
     }
     
     // Verify current password
-    const isPasswordValid = db.verifyAdminPassword(currentPassword);
+    const isPasswordValid = await db.verifyAdminPassword(currentPassword);
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: 'Current password is incorrect' });
     }
     
     // Update password
-    db.updateAdminPassword(newPassword);
+    await db.updateAdminPassword(newPassword);
     
     // Create new token
-    const newToken = db.createAuthToken();
+    const newToken = await db.createAuthToken();
     res.json({ success: true, token: newToken });
   } catch (error) {
+    console.error('Error changing password:', error);
     res.status(500).json({ success: false, message: 'Error changing password' });
   }
 });
 
 // Get shop status
-app.get('/api/shop-status', (req, res) => {
+app.get('/api/shop-status', async (req, res) => {
   try {
-    const status = db.getShopStatus();
+    const status = await db.getShopStatus();
     res.json(status);
   } catch (error) {
+    console.error('Error fetching shop status:', error);
     res.status(500).json({ success: false, message: 'Error fetching shop status' });
   }
 });
 
 // Update shop status
-app.post('/api/shop-status', (req, res) => {
+app.post('/api/shop-status', async (req, res) => {
   try {
-    const status = db.updateShopStatus(req.body.isOpen);
+    const status = await db.updateShopStatus(req.body.isOpen);
     res.json({ success: true, status });
   } catch (error) {
+    console.error('Error updating shop status:', error);
     res.status(500).json({ success: false, message: 'Error updating shop status' });
   }
 });
@@ -339,7 +414,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-// Global Error Handler
+app.get('/today', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'today.html'));
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
   

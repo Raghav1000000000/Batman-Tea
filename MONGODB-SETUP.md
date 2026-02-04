@@ -74,11 +74,14 @@
    - Select **"Drivers"**
    - Driver: **Node.js**
    - Version: **6.8 or later**
-
+<!-- /- -->
+mongodb+srv://batman-tea-admin:Batmantea@123@batman-tea-cluster.bgmmn76.mongodb.net/?appName=batman-tea-cluster
+<!--  -->
 2. **Copy Connection String**:
    ```
    mongodb+srv://batman-tea-admin:<password>@batman-tea-cluster.xxxxx.mongodb.net/?retryWrites=true&w=majority
    ```
+   mongodb+srv://batman-tea-admin:batmantea@123@batmantea2026.ng3bwv8.mongodb.net/?appName=BatmanTea2026
 
 3. **Replace `<password>`** with your actual password:
    ```
