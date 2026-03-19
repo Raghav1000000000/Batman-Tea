@@ -7,7 +7,6 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const morgan = require('morgan');
-const fs = require('fs');
 const cron = require('node-cron');
 const db = require('./database-mongo'); // Changed to MongoDB
 
@@ -49,11 +48,16 @@ app.use(helmet({
 
 // Logging
 if (NODE_ENV === 'production') {
-  const accessLogStream = fs.createWriteStream(
-    path.join(__dirname, 'access.log'),
-    { flags: 'a' }
-  );
-  app.use(morgan('combined', { stream: accessLogStream }));
+  const isServerless = process.env.VERCEL === '1';
+
+  if (isServerless) {
+    // Vercel filesystem is read-only; write access logs to stdout.
+    app.use(morgan('combined'));
+  } else {
+    app.use(morgan('combined', {
+      stream: require('fs').createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+    }));
+  }
 } else {
   app.use(morgan('dev'));
 }
