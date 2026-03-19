@@ -42,6 +42,7 @@ app.use(helmet({
       scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers (onclick, etc.)
       styleSrc: ["'self'", "'unsafe-inline'"],
       connectSrc: ["'self'", "https://vercel.live"],
+      frameSrc: ["'self'", "https://vercel.live"],
       imgSrc: ["'self'", "data:"],
     },
   },
@@ -68,6 +69,15 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : ['http://localhost:3000'];
 
+const isVercelPreviewOrigin = (origin) => {
+  try {
+    const host = new URL(origin).hostname;
+    return host.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+};
+
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -78,7 +88,11 @@ app.use(cors({
       return callback(null, true);
     }
     
-    if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === 'development') {
+    if (
+      allowedOrigins.indexOf(origin) !== -1 ||
+      NODE_ENV === 'development' ||
+      (process.env.VERCEL === '1' && isVercelPreviewOrigin(origin))
+    ) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
