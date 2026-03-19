@@ -38,9 +38,10 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-hashes'"], // Allow inline scripts and event handlers
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-hashes'", "https://vercel.live"], // Allow inline scripts and Vercel feedback script
       scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers (onclick, etc.)
       styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "https://vercel.live"],
       imgSrc: ["'self'", "data:"],
     },
   },

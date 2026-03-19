@@ -817,7 +817,7 @@
         // Check shop status
         async function checkShopStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/shop-status');
+                const response = await fetch('/api/shop-status');
                 const status = await response.json();
                 
                 if (!status.isOpen) {
@@ -874,7 +874,7 @@
             };
 
             try {
-                const response = await fetch('http://localhost:3000/api/bookings', {
+                const response = await fetch('/api/bookings', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -934,7 +934,7 @@
         // Load notifications
         async function loadNotifications() {
             try {
-                const response = await fetch('http://localhost:3000/api/notifications');
+                const response = await fetch('/api/notifications');
                 const notifications = await response.json();
                 
                 if (notifications.length > 0) {
@@ -960,7 +960,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/bookings');
+                const response = await fetch('/api/bookings');
                 const allBookings = await response.json();
                 
                 // Filter bookings by customer phone

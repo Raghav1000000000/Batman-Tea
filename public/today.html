@@ -407,7 +407,7 @@
 
         async function loadTodayBookings() {
             try {
-                const response = await fetch('http://localhost:3000/api/bookings');
+                const response = await fetch('/api/bookings');
                 const allBookings = await response.json();
                 
                 // Filter only today's bookings
@@ -492,7 +492,7 @@
             updateStats();
 
             try {
-                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                const response = await fetch(`/api/bookings/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status, phone: booking.phone })
@@ -514,7 +514,7 @@
             const eta = document.getElementById(`eta-${id}`).value;
             
             try {
-                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                const response = await fetch(`/api/bookings/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ eta, phone: booking.phone })
@@ -539,7 +539,7 @@
             if (!booking) return;
 
             try {
-                const response = await fetch(`http://localhost:3000/api/bookings/${id}?phone=${encodeURIComponent(booking.phone)}`, {
+                const response = await fetch(`/api/bookings/${id}?phone=${encodeURIComponent(booking.phone)}`, {
                     method: 'DELETE'
                 });
 
@@ -564,7 +564,7 @@
 
         async function loadShopStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/shop-status');
+                const response = await fetch('/api/shop-status');
                 const status = await response.json();
                 shopIsOpen = status.isOpen;
                 updateToggleButton();
@@ -594,7 +594,7 @@
             updateToggleButton();
 
             try {
-                await fetch('http://localhost:3000/api/shop-status', {
+                await fetch('/api/shop-status', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ isOpen: shopIsOpen })
@@ -608,7 +608,7 @@
 
         async function loadNotifications() {
             try {
-                const response = await fetch('http://localhost:3000/api/notifications');
+                const response = await fetch('/api/notifications');
                 notifications = await response.json();
                 renderNotifications();
             } catch (error) {
@@ -646,7 +646,7 @@
             const token = localStorage.getItem('dashboardAuthToken');
             
             try {
-                await fetch('http://localhost:3000/api/auth/logout', {
+                await fetch('/api/auth/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token })

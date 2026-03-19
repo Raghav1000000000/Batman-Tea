@@ -1066,7 +1066,7 @@
 
         async function updateShopStatusOnServer(isOpen) {
             try {
-                const response = await fetch('http://localhost:3000/api/shop-status', {
+                const response = await fetch('/api/shop-status', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1086,7 +1086,7 @@
 
         async function loadBookings() {
             try {
-                const response = await fetch('http://localhost:3000/api/bookings');
+                const response = await fetch('/api/bookings');
                 bookings = await response.json();
                 
                 // Sort by created date, newest first
@@ -1240,7 +1240,7 @@
             updateStats();
 
             try {
-                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                const response = await fetch(`/api/bookings/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1278,7 +1278,7 @@
             renderBookings();
 
             try {
-                const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                const response = await fetch(`/api/bookings/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1324,7 +1324,7 @@
             updateStats();
 
             try {
-                const response = await fetch(`http://localhost:3000/api/bookings/${id}?phone=${encodeURIComponent(booking.phone)}`, {
+                const response = await fetch(`/api/bookings/${id}?phone=${encodeURIComponent(booking.phone)}`, {
                     method: 'DELETE'
                 });
 
@@ -1361,8 +1361,8 @@
 
             try {
                 const url = editingId 
-                    ? `http://localhost:3000/api/notifications/${editingId}`
-                    : 'http://localhost:3000/api/notifications';
+                    ? `/api/notifications/${editingId}`
+                    : '/api/notifications';
                 const method = editingId ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -1403,7 +1403,7 @@
 
         async function loadNotifications() {
             try {
-                const response = await fetch('http://localhost:3000/api/notifications');
+                const response = await fetch('/api/notifications');
                 const notifications = await response.json();
                 renderNotifications(notifications);
             } catch (error) {
@@ -1469,7 +1469,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/notifications/${id}`, {
+                const response = await fetch(`/api/notifications/${id}`, {
                     method: 'DELETE'
                 });
 
@@ -1500,7 +1500,7 @@
 
         async function loadShopStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/shop-status');
+                const response = await fetch('/api/shop-status');
                 const status = await response.json();
                 shopIsOpen = status.isOpen;
                 updateToggleButton();
@@ -1522,7 +1522,7 @@
 
             const newStatus = !shopIsOpen;
             try {
-                const response = await fetch('http://localhost:3000/api/shop-status', {
+                const response = await fetch('/api/shop-status', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1598,7 +1598,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/verify', {
+                const response = await fetch('/api/auth/verify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: authToken })
@@ -1639,7 +1639,7 @@
             errorDiv.classList.remove('show');
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/login', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
@@ -1667,7 +1667,7 @@
 
         async function handleLogout() {
             try {
-                await fetch('http://localhost:3000/api/auth/logout', {
+                await fetch('/api/auth/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: authToken })
