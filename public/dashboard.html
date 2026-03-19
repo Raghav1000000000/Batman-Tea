@@ -966,7 +966,7 @@
 
     <div class="shop-hours">
         <div class="shop-hours-text">
-            <strong>⏰ Shop Hours:</strong> <span id="shopHoursDisplay">12:00 AM - 5:00 AM</span>
+            <strong>⏰ Shop Hours:</strong> <span id="shopHoursDisplay">12:00 AM - 4:00 AM</span>
         </div>
         <div class="auto-toggle">
             <input type="checkbox" id="autoToggle" onchange="toggleAutoMode()">
@@ -1031,7 +1031,7 @@
         let shopIsOpen = true;
         let autoMode = localStorage.getItem('autoMode') === 'true';
         const OPEN_HOUR = 0;  // 12 AM (midnight)
-        const CLOSE_HOUR = 5; // 5 AM
+        const CLOSE_HOUR = 4; // 4 AM
 
         // Initialize auto mode
         document.getElementById('autoToggle').checked = autoMode;
